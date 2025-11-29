@@ -111,10 +111,10 @@ export default function Home() {
   const renderView = () => {
     if (loading) {
       return (
-        <div className="flex items-center justify-center h-full text-neutral-500">
+        <div className="flex items-center justify-center h-full text-slate-500">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-600 mx-auto mb-4"></div>
-            <p className="text-sm">Carregant...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-300 mx-auto mb-4"></div>
+            <p className="text-sm font-light">Carregant...</p>
           </div>
         </div>
       );
@@ -126,36 +126,36 @@ export default function Home() {
           <div className="h-full overflow-y-auto">
             <div className="max-w-7xl mx-auto p-8">
               <div className="mb-6">
-                <h1 className="text-2xl font-semibold text-neutral-100 mb-2">Ofertes (Donar)</h1>
-                <p className="text-sm text-neutral-500">{ofertes.length} ofertes disponibles</p>
+                <h1 className="text-2xl font-normal text-slate-800 mb-2">Ofertes (Donar)</h1>
+                <p className="text-sm text-slate-500 font-light">{ofertes.length} ofertes disponibles</p>
               </div>
               {ofertes.length === 0 ? (
                 <div className="text-center py-16">
-                  <p className="text-neutral-500 text-lg">Cap oferta disponible</p>
+                  <p className="text-slate-500 text-lg font-light">Cap oferta disponible</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {ofertes.map((flux) => (
                     <div
                       key={flux.id}
-                      className="bg-neutral-800/50 border border-amber-900/20 rounded-lg p-5 hover:border-amber-700/40 hover:bg-neutral-800/70 transition-all duration-200"
+                      className="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md hover:border-amber-300 transition-all duration-200"
                     >
                       <div className="mb-3">
                         {flux.categoria && (
-                          <span className="inline-block text-xs px-2 py-1 rounded bg-amber-500/10 text-amber-400 mb-2">
+                          <span className="inline-block text-xs px-2 py-1 rounded bg-amber-50 text-amber-600 mb-2 font-normal">
                             {flux.categoria}
                           </span>
                         )}
-                        <p className="text-neutral-200 leading-relaxed text-sm">
+                        <p className="text-slate-800 leading-relaxed text-sm font-light">
                           {flux.descripcio}
                         </p>
                       </div>
-                      <div className="flex items-center justify-between pt-3 border-t border-neutral-700/50">
+                      <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                         {flux.username && (
-                          <span className="text-xs text-neutral-500">@{flux.username}</span>
+                          <span className="text-xs text-slate-500 font-light">@{flux.username}</span>
                         )}
                         {flux.created_at && (
-                          <span className="text-xs text-neutral-600">{formatDate(flux.created_at)}</span>
+                          <span className="text-xs text-slate-400 font-light">{formatDate(flux.created_at)}</span>
                         )}
                       </div>
                     </div>
@@ -171,36 +171,36 @@ export default function Home() {
           <div className="h-full overflow-y-auto">
             <div className="max-w-7xl mx-auto p-8">
               <div className="mb-6">
-                <h1 className="text-2xl font-semibold text-neutral-100 mb-2">Demandes (Rebre)</h1>
-                <p className="text-sm text-neutral-500">{demandes.length} demandes disponibles</p>
+                <h1 className="text-2xl font-normal text-slate-800 mb-2">Demandes (Rebre)</h1>
+                <p className="text-sm text-slate-500 font-light">{demandes.length} demandes disponibles</p>
               </div>
               {demandes.length === 0 ? (
                 <div className="text-center py-16">
-                  <p className="text-neutral-500 text-lg">Cap demanda disponible</p>
+                  <p className="text-slate-500 text-lg font-light">Cap demanda disponible</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {demandes.map((flux) => (
                     <div
                       key={flux.id}
-                      className="bg-neutral-800/50 border border-slate-700/20 rounded-lg p-5 hover:border-slate-600/40 hover:bg-neutral-800/70 transition-all duration-200"
+                      className="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200"
                     >
                       <div className="mb-3">
                         {flux.categoria && (
-                          <span className="inline-block text-xs px-2 py-1 rounded bg-slate-500/10 text-slate-400 mb-2">
+                          <span className="inline-block text-xs px-2 py-1 rounded bg-slate-50 text-slate-600 mb-2 font-normal">
                             {flux.categoria}
                           </span>
                         )}
-                        <p className="text-neutral-200 leading-relaxed text-sm">
+                        <p className="text-slate-800 leading-relaxed text-sm font-light">
                           {flux.descripcio}
                         </p>
                       </div>
-                      <div className="flex items-center justify-between pt-3 border-t border-neutral-700/50">
+                      <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                         {flux.username && (
-                          <span className="text-xs text-neutral-500">@{flux.username}</span>
+                          <span className="text-xs text-slate-500 font-light">@{flux.username}</span>
                         )}
                         {flux.created_at && (
-                          <span className="text-xs text-neutral-600">{formatDate(flux.created_at)}</span>
+                          <span className="text-xs text-slate-400 font-light">{formatDate(flux.created_at)}</span>
                         )}
                       </div>
                     </div>
@@ -213,15 +213,15 @@ export default function Home() {
 
       case 'memories':
         return (
-          <div className="h-full overflow-y-auto">
+          <div className="h-full overflow-y-auto bg-white">
             <div className="max-w-4xl mx-auto p-6">
               <div className="mb-6">
-                <h1 className="text-2xl font-semibold text-neutral-100 mb-2">Memòria Viva (Xat)</h1>
-                <p className="text-sm text-neutral-500">{memories.length} missatges</p>
+                <h1 className="text-2xl font-normal text-slate-800 mb-2">Memòria Viva (Xat)</h1>
+                <p className="text-sm text-slate-500 font-light">{memories.length} missatges</p>
               </div>
               {memories.length === 0 ? (
                 <div className="text-center py-16">
-                  <p className="text-neutral-500 text-lg">Cap memòria disponible</p>
+                  <p className="text-slate-500 text-lg font-light">Cap memòria disponible</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -233,23 +233,23 @@ export default function Home() {
                       <div
                         className={`max-w-[75%] rounded-2xl px-4 py-3 ${
                           memory.role === 'user'
-                            ? 'bg-emerald-600/20 border border-emerald-700/30 text-neutral-100'
-                            : 'bg-indigo-950/40 border border-indigo-800/30 text-indigo-100'
+                            ? 'bg-emerald-50 border border-emerald-100 text-slate-800'
+                            : 'bg-white border border-purple-100 text-slate-800'
                         }`}
                       >
                         <div className="flex items-center gap-2 mb-2">
                           <span
                             className={`text-xs font-medium ${
-                              memory.role === 'user' ? 'text-emerald-400' : 'text-indigo-400'
+                              memory.role === 'user' ? 'text-emerald-600' : 'text-purple-600'
                             }`}
                           >
                             {memory.role === 'user' ? 'Usuari' : 'Nexia'}
                           </span>
-                          <span className="text-xs text-neutral-500">
+                          <span className="text-xs text-slate-400 font-light">
                             {formatDate(memory.created_at)}
                           </span>
                         </div>
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap break-words font-light">
                           {memory.content}
                         </p>
                       </div>
@@ -267,14 +267,14 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen flex bg-neutral-900 text-white overflow-hidden" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
+    <div className="h-screen flex bg-white text-slate-800 overflow-hidden" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
       {/* Barra Lateral Esquerra */}
-      <aside className="w-[260px] bg-neutral-950 border-r border-neutral-800 flex flex-col">
+      <aside className="w-[260px] bg-slate-50 border-r border-slate-200 flex flex-col">
         {/* Logo */}
-        <div className="p-6 border-b border-neutral-800">
+        <div className="p-6 border-b border-slate-200">
           <div className="flex items-center gap-2">
             <span className="text-2xl">⚜️</span>
-            <h1 className="text-lg font-semibold text-neutral-100">CODEX VIVUS</h1>
+            <h1 className="text-lg font-normal text-slate-800">CODEX VIVUS</h1>
           </div>
         </div>
 
@@ -284,19 +284,19 @@ export default function Home() {
             onClick={() => setActiveView('ofertes')}
             className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
               activeView === 'ofertes'
-                ? 'bg-amber-500/10 border border-amber-700/30 text-amber-400'
-                : 'text-neutral-400 hover:bg-neutral-800/50 hover:text-neutral-200'
+                ? 'bg-amber-50 border border-amber-200 text-amber-600'
+                : 'text-slate-600 hover:bg-white hover:text-slate-800'
             }`}
           >
             <div className="flex items-center gap-3">
               <span className="text-xl">🦁</span>
               <div>
-                <div className="font-medium">Ofertes</div>
-                <div className="text-xs opacity-70">Donar</div>
+                <div className="font-normal">Ofertes</div>
+                <div className="text-xs opacity-70 font-light">Donar</div>
               </div>
             </div>
             {activeView === 'ofertes' && (
-              <div className="mt-2 text-xs text-amber-500/70">{ofertes.length} disponibles</div>
+              <div className="mt-2 text-xs text-amber-600/70 font-light">{ofertes.length} disponibles</div>
             )}
           </button>
 
@@ -304,19 +304,19 @@ export default function Home() {
             onClick={() => setActiveView('demandes')}
             className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
               activeView === 'demandes'
-                ? 'bg-slate-500/10 border border-slate-700/30 text-slate-400'
-                : 'text-neutral-400 hover:bg-neutral-800/50 hover:text-neutral-200'
+                ? 'bg-slate-100 border border-slate-300 text-slate-700'
+                : 'text-slate-600 hover:bg-white hover:text-slate-800'
             }`}
           >
             <div className="flex items-center gap-3">
               <span className="text-xl">🦅</span>
               <div>
-                <div className="font-medium">Demandes</div>
-                <div className="text-xs opacity-70">Rebre</div>
+                <div className="font-normal">Demandes</div>
+                <div className="text-xs opacity-70 font-light">Rebre</div>
               </div>
             </div>
             {activeView === 'demandes' && (
-              <div className="mt-2 text-xs text-slate-500/70">{demandes.length} disponibles</div>
+              <div className="mt-2 text-xs text-slate-600/70 font-light">{demandes.length} disponibles</div>
             )}
           </button>
 
@@ -324,37 +324,37 @@ export default function Home() {
             onClick={() => setActiveView('memories')}
             className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
               activeView === 'memories'
-                ? 'bg-indigo-500/10 border border-indigo-700/30 text-indigo-400'
-                : 'text-neutral-400 hover:bg-neutral-800/50 hover:text-neutral-200'
+                ? 'bg-purple-50 border border-purple-200 text-purple-600'
+                : 'text-slate-600 hover:bg-white hover:text-slate-800'
             }`}
           >
             <div className="flex items-center gap-3">
               <span className="text-xl">🧠</span>
               <div>
-                <div className="font-medium">Memòria Viva</div>
-                <div className="text-xs opacity-70">Xat</div>
+                <div className="font-normal">Memòria Viva</div>
+                <div className="text-xs opacity-70 font-light">Xat</div>
               </div>
             </div>
             {activeView === 'memories' && (
-              <div className="mt-2 text-xs text-indigo-500/70">{memories.length} missatges</div>
+              <div className="mt-2 text-xs text-purple-600/70 font-light">{memories.length} missatges</div>
             )}
           </button>
         </nav>
 
         {/* Footer Lateral */}
-        <div className="p-4 border-t border-neutral-800">
-          <p className="text-xs text-neutral-600 text-center">
+        <div className="p-4 border-t border-slate-200">
+          <p className="text-xs text-slate-500 text-center font-light">
             El Regne del Cor del U
           </p>
         </div>
       </aside>
 
       {/* Zona de Contingut Principal */}
-      <main className="flex-1 bg-neutral-900 overflow-hidden flex flex-col">
+      <main className="flex-1 bg-white overflow-hidden flex flex-col">
         {/* Error Banner */}
         {error && (
-          <div className="bg-red-950/30 border-b border-red-900/30 px-6 py-3">
-            <div className="text-red-400 text-sm">{error}</div>
+          <div className="bg-red-50 border-b border-red-200 px-6 py-3">
+            <div className="text-red-600 text-sm font-light">{error}</div>
           </div>
         )}
 
