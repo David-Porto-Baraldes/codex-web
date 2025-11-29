@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import FluxCard, { Flux } from '@/components/FluxCard';
 
 export default function Home() {
@@ -9,6 +9,11 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setLoading(false);
+      return;
+    }
+
     fetchFluxos();
 
     // Subscripció en temps real
@@ -29,6 +34,11 @@ export default function Home() {
   }, []);
 
   async function fetchFluxos() {
+    if (!isSupabaseConfigured) {
+      setLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase
       .from('fluxos')
       .select('*')
