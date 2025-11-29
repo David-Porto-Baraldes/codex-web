@@ -13,7 +13,7 @@ interface Flux {
   descripcio: string;
   categoria?: string;
   username?: string;
-  created_at: string;
+  created_at?: string;
 }
 
 interface Memory {
@@ -42,11 +42,11 @@ export default function Home() {
       try {
         const supabase = createClient(supabaseUrl, supabaseKey);
 
-        // Carrega fluxos
+        // Carrega fluxos (sense ordenar per created_at ja que pot no existir)
         const { data: fluxosData, error: fluxosError } = await supabase
           .from('fluxos')
           .select('*')
-          .order('created_at', { ascending: false });
+          .order('id', { ascending: false });
 
         if (fluxosError) {
           console.error('Error carregant fluxos:', fluxosError);
@@ -190,7 +190,7 @@ export default function Home() {
                         {flux.categoria && (
                           <span className="text-xs text-amber-600/70">{flux.categoria}</span>
                         )}
-                        <span className="text-xs text-neutral-600">{formatDate(flux.created_at)}</span>
+                        <span className="text-xs text-neutral-600">{flux.created_at ? formatDate(flux.created_at) : ''}</span>
                       </div>
                       {flux.username && (
                         <p className="text-xs text-neutral-700 mt-1.5">@{flux.username}</p>
@@ -275,7 +275,7 @@ export default function Home() {
                         {flux.categoria && (
                           <span className="text-xs text-slate-500/70">{flux.categoria}</span>
                         )}
-                        <span className="text-xs text-neutral-600">{formatDate(flux.created_at)}</span>
+                        <span className="text-xs text-neutral-600">{flux.created_at ? formatDate(flux.created_at) : ''}</span>
                       </div>
                       {flux.username && (
                         <p className="text-xs text-neutral-700 mt-1.5">@{flux.username}</p>
