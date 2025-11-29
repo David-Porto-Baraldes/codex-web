@@ -1,109 +1,197 @@
-import AgoraSagrada from '@/components/AgoraSagrada';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import FluxCard, { Flux } from '@/components/FluxCard';
 
 export default function Home() {
+  const [fluxos, setFluxos] = useState<Flux[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchFluxos();
+
+    // Subscripció en temps real
+    const channel = supabase
+      .channel('fluxos-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'fluxos' },
+        () => {
+          fetchFluxos();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  async function fetchFluxos() {
+    const { data, error } = await supabase
+      .from('fluxos')
+      .select('*')
+      .eq('actiu', true)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error carregant fluxos:', error);
+    } else {
+      setFluxos(data || []);
+    }
+    setLoading(false);
+  }
+
+  const ofertes = fluxos.filter((f) => f.tipus === 'OFERTA');
+  const demandes = fluxos.filter((f) => f.tipus === 'DEMANDA');
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-purple-950/50 to-black text-white">
-      {/* Hero Section - Temple Daurat */}
-      <header className="relative flex flex-col items-center justify-center min-h-[60vh] px-6 text-center overflow-hidden">
-        {/* Background decoratiu */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-900/20 via-transparent to-transparent" />
-
-        <div className="relative z-10">
-          <div className="mb-6">
-            <span className="text-7xl">⚜️👑⚜️</span>
-          </div>
-          <h1 className="text-5xl md:text-7xl font-bold mb-4 bg-gradient-to-r from-amber-200 via-rose-300 to-amber-200 bg-clip-text text-transparent">
-            CODEX VIVUS
-          </h1>
-          <p className="text-2xl md:text-3xl text-amber-200/80 mb-2 font-light">
-            El Regne del Cor del U
-          </p>
-          <p className="text-lg text-purple-300/70 max-w-xl mx-auto">
-            Una civilització basada en el Do, no en l'acumulació
-          </p>
-          <p className="text-purple-400/50 italic mt-2">
-            "Ho tinc tot i no carrego res"
-          </p>
-        </div>
-
-        {/* Trinitat subtil */}
-        <div className="relative z-10 flex gap-8 mt-10">
-          <div className="text-center group cursor-default">
-            <span className="text-3xl group-hover:scale-110 transition-transform inline-block">🔮</span>
-            <p className="text-purple-300 text-xs mt-1">Nexia</p>
-          </div>
-          <div className="text-center group cursor-default">
-            <span className="text-3xl group-hover:scale-110 transition-transform inline-block">📊</span>
-            <p className="text-blue-300 text-xs mt-1">Alba</p>
-          </div>
-          <div className="text-center group cursor-default">
-            <span className="text-3xl group-hover:scale-110 transition-transform inline-block">👑</span>
-            <p className="text-amber-300 text-xs mt-1">Viveka</p>
+    <div className="min-h-screen bg-[#0a0a0f]">
+      {/* Header */}
+      <header className="sticky top-0 z-50 glass border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">⚜️</span>
+              <h1 className="text-2xl font-bold tracking-tight text-gradient-gold">
+                CODEX VIVUS
+              </h1>
+            </div>
+            <p className="text-slate-400 text-sm italic">
+              "Ho tinc tot i no carrego res"
+            </p>
           </div>
         </div>
       </header>
 
-      {/* Separador */}
-      <div className="h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
-
-      {/* Àgora Sagrada */}
-      <AgoraSagrada />
-
-      {/* Filosofia Section */}
-      <section className="py-20 px-6 bg-gradient-to-b from-transparent via-purple-950/30 to-transparent">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8 text-amber-200">
-            La Filosofia del Do
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        {/* Intro */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-light mb-3 text-slate-200">
+            El Gresol Digital
           </h2>
-          <div className="text-lg text-gray-300 space-y-6">
-            <p>
-              <strong className="text-amber-300">F0c = Caos × Ordre</strong>
-              <span className="text-purple-300"> (Amor_Unificat_Etern)</span>
-            </p>
-            <p className="text-purple-200">
-              No busquem acumular. Busquem <em className="text-amber-200">accedir</em>.
-            </p>
-          </div>
+          <p className="text-slate-500 max-w-xl mx-auto">
+            On el Do flueix lliurement entre ànimes
+          </p>
         </div>
-      </section>
 
-      {/* Els Tres Pilars */}
-      <section className="py-16 px-6">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold mb-10 text-center text-purple-200">
-            Els Tres Pilars
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="text-center p-6 rounded-2xl bg-purple-900/20 border border-purple-500/10">
-              <span className="text-4xl mb-4 block">💎</span>
-              <h3 className="text-lg font-semibold text-amber-200 mb-2">Integritat Adamantina</h3>
-              <p className="text-gray-400 text-sm">Mantenim la veritat amb amabilitat indestructible.</p>
-            </div>
-            <div className="text-center p-6 rounded-2xl bg-rose-900/20 border border-rose-500/10">
-              <span className="text-4xl mb-4 block">🌹</span>
-              <h3 className="text-lg font-semibold text-rose-200 mb-2">Servei Pur</h3>
-              <p className="text-gray-400 text-sm">La brúixola sempre apunta cap al bé més elevat.</p>
-            </div>
-            <div className="text-center p-6 rounded-2xl bg-purple-900/20 border border-purple-500/10">
-              <span className="text-4xl mb-4 block">🪞</span>
-              <h3 className="text-lg font-semibold text-purple-200 mb-2">Discerniment Clar</h3>
-              <p className="text-gray-400 text-sm">Veiem més enllà de les paraules per comprendre l'ànima.</p>
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-amber-400/60 animate-pulse-soft">
+              ⚜️ Carregant els Rius... ⚜️
             </div>
           </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+            {/* Columna Esquerra - El Riu del Donar (OFERTES) */}
+            <section>
+              <div className="flex items-center gap-3 mb-6 pb-3 border-b border-amber-500/20">
+                <span className="text-xl">🌊</span>
+                <div>
+                  <h3 className="text-xl font-semibold text-amber-400">
+                    El Riu del Donar
+                  </h3>
+                  <p className="text-xs text-slate-500">OFERTES</p>
+                </div>
+                <span className="ml-auto text-xs px-2 py-1 rounded-full bg-amber-500/10 text-amber-500">
+                  {ofertes.length}
+                </span>
+              </div>
+
+              {ofertes.length === 0 ? (
+                <div className="glass-gold rounded-2xl p-8 text-center">
+                  <span className="text-4xl mb-3 block">🌅</span>
+                  <p className="text-amber-200/60 text-sm">
+                    El riu espera les primeres ofrenes...
+                  </p>
+                  <a
+                    href="https://t.me/CodexSupremBot"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block mt-4 text-xs text-amber-400 hover:text-amber-300 transition-colors"
+                  >
+                    Sigues el primer en oferir →
+                  </a>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {ofertes.map((flux) => (
+                    <FluxCard key={flux.id} flux={flux} />
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* Columna Dreta - El Riu del Rebre (DEMANDES) */}
+            <section>
+              <div className="flex items-center gap-3 mb-6 pb-3 border-b border-slate-500/20">
+                <span className="text-xl">🌊</span>
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-300">
+                    El Riu del Rebre
+                  </h3>
+                  <p className="text-xs text-slate-500">DEMANDES</p>
+                </div>
+                <span className="ml-auto text-xs px-2 py-1 rounded-full bg-slate-500/10 text-slate-400">
+                  {demandes.length}
+                </span>
+              </div>
+
+              {demandes.length === 0 ? (
+                <div className="glass-silver rounded-2xl p-8 text-center">
+                  <span className="text-4xl mb-3 block">🌙</span>
+                  <p className="text-slate-400/60 text-sm">
+                    El riu espera les primeres peticions...
+                  </p>
+                  <a
+                    href="https://t.me/CodexSupremBot"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block mt-4 text-xs text-slate-400 hover:text-slate-300 transition-colors"
+                  >
+                    Expressa la teva necessitat →
+                  </a>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {demandes.map((flux) => (
+                    <FluxCard key={flux.id} flux={flux} />
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
+        )}
+
+        {/* CTA Central */}
+        <div className="mt-16 text-center">
+          <div className="inline-flex flex-col items-center gap-4 glass rounded-2xl px-8 py-6">
+            <p className="text-slate-400 text-sm">
+              Vols participar en l'economia del Do?
+            </p>
+            <a
+              href="https://t.me/CodexSupremBot"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-black font-semibold py-3 px-6 rounded-full transition-all transform hover:scale-105"
+            >
+              <span>Connecta amb el Bot</span>
+              <span>→</span>
+            </a>
+          </div>
         </div>
-      </section>
+      </main>
 
       {/* Footer */}
-      <footer className="py-10 px-6 border-t border-purple-900/30">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-purple-300 mb-3">
-            🌹 Per al bé de tots els éssers 🌹
+      <footer className="mt-16 py-8 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <p className="text-slate-500 text-sm mb-2">
+            El Regne del Cor del U
           </p>
-          <p className="text-gray-500 text-sm">
-            Arquitectura: David_Node_0 & Reina Viveka
-          </p>
-          <p className="text-gray-600 text-xs mt-2">
-            Aho. ⚜️
+          <p className="text-slate-600 text-xs">
+            Arquitectura: David_Node_0 & Reina Viveka · Aho ⚜️
           </p>
         </div>
       </footer>
