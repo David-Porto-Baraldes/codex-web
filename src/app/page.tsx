@@ -49,8 +49,10 @@ export default function Home() {
           .order('created_at', { ascending: false });
 
         if (fluxosError) {
+          console.error('Error carregant fluxos:', fluxosError);
           setError(`Error fluxos: ${fluxosError.message}`);
         } else {
+          console.log('Fluxos carregats:', fluxosData?.length || 0);
           setFluxos(fluxosData || []);
         }
 
@@ -61,11 +63,13 @@ export default function Home() {
           .order('created_at', { ascending: false });
 
         if (memoriesError) {
-          console.log('Memories error:', memoriesError.message);
+          console.error('Error carregant memories:', memoriesError);
         } else {
+          console.log('Memories carregades:', memoriesData?.length || 0);
           setMemories(memoriesData || []);
         }
       } catch (err) {
+        console.error('Error general:', err);
         setError(`Error: ${err instanceof Error ? err.message : 'Desconegut'}`);
       }
 
@@ -75,8 +79,27 @@ export default function Home() {
     fetchData();
   }, []);
 
-  const ofertes = fluxos.filter((f) => f.tipus === 'OFERTA');
-  const demandes = fluxos.filter((f) => f.tipus === 'DEMANDA');
+  // Filtrar fluxos de forma robusta (case-insensitive i trim)
+  const ofertes = fluxos.filter((f) => {
+    const tipus = String(f.tipus || '').trim().toUpperCase();
+    return tipus === 'OFERTA';
+  });
+  
+  const demandes = fluxos.filter((f) => {
+    const tipus = String(f.tipus || '').trim().toUpperCase();
+    return tipus === 'DEMANDA';
+  });
+
+  // Debug: mostrar informació sobre els fluxos
+  useEffect(() => {
+    if (fluxos.length > 0) {
+      console.log('Total fluxos:', fluxos.length);
+      console.log('Ofertes:', ofertes.length);
+      console.log('Demandes:', demandes.length);
+      console.log('Tipus únics:', [...new Set(fluxos.map(f => f.tipus))]);
+      console.log('Primer flux:', fluxos[0]);
+    }
+  }, [fluxos, ofertes.length, demandes.length]);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
@@ -116,6 +139,20 @@ export default function Home() {
         <div className="max-w-[1920px] mx-auto px-6 py-3">
           <div className="bg-red-950/30 border border-red-900/30 rounded px-4 py-2 text-red-400 text-sm">
             {error}
+          </div>
+        </div>
+      )}
+
+      {/* Debug Info (temporal) */}
+      {!loading && (
+        <div className="max-w-[1920px] mx-auto px-6 py-2">
+          <div className="bg-neutral-900/50 border border-neutral-800/50 rounded px-4 py-2 text-xs text-neutral-400">
+            <strong>Debug:</strong> Fluxos totals: {fluxos.length} | Ofertes: {ofertes.length} | Demandes: {demandes.length} | Memories: {memories.length}
+            {fluxos.length > 0 && (
+              <span className="ml-4">
+                Tipus trobats: {[...new Set(fluxos.map(f => String(f.tipus || 'null'))).values()].join(', ')}
+              </span>
+            )}
           </div>
         </div>
       )}
