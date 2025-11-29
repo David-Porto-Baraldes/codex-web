@@ -117,7 +117,7 @@ export default function Home() {
                     El riu espera les primeres ofrenes...
                   </p>
                   <a
-                    href="https://t.me/CodexSupremBot"
+                    href="https://t.me/Codex_Suprem_bot"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-block mt-4 text-xs text-amber-400 hover:text-amber-300 transition-colors"
@@ -156,7 +156,7 @@ export default function Home() {
                     El riu espera les primeres peticions...
                   </p>
                   <a
-                    href="https://t.me/CodexSupremBot"
+                    href="https://t.me/Codex_Suprem_bot"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-block mt-4 text-xs text-slate-400 hover:text-slate-300 transition-colors"
@@ -182,7 +182,7 @@ export default function Home() {
               Vols participar en l'economia del Do?
             </p>
             <a
-              href="https://t.me/CodexSupremBot"
+              href="https://t.me/Codex_Suprem_bot"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-black font-semibold py-3 px-6 rounded-full transition-all transform hover:scale-105"

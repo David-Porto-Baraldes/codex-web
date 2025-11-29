@@ -100,7 +100,7 @@ export default function FluxCard({ flux }: FluxCardProps) {
           </span>
         )}
         <a
-          href="https://t.me/CodexSupremBot"
+          href="https://t.me/Codex_Suprem_bot"
           target="_blank"
           rel="noopener noreferrer"
           className={`
