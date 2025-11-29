@@ -1,57 +1,52 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import FluxCard, { Flux } from '@/components/FluxCard';
+
+// Client Supabase directe (sense cache)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 export default function Home() {
   const [fluxos, setFluxos] = useState<Flux[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [debug, setDebug] = useState('');
 
   useEffect(() => {
-    if (!isSupabaseConfigured) {
+    async function fetchFluxos() {
+      // Debug: mostrar si tenim les claus
+      if (!supabaseUrl || !supabaseKey) {
+        setError('Falten les variables NEXT_PUBLIC_SUPABASE_URL o NEXT_PUBLIC_SUPABASE_ANON_KEY');
+        setDebug(`URL: ${supabaseUrl ? 'OK' : 'BUIDA'} | KEY: ${supabaseKey ? 'OK' : 'BUIDA'}`);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        const { data, error: supabaseError } = await supabase
+          .from('fluxos')
+          .select('*');
+
+        if (supabaseError) {
+          setError(`Error Supabase: ${supabaseError.message}`);
+          setDebug(`Code: ${supabaseError.code} | Details: ${supabaseError.details || 'cap'}`);
+        } else {
+          setFluxos(data || []);
+          setDebug(`Registres trobats: ${data?.length || 0}`);
+        }
+      } catch (err) {
+        setError(`Error de connexió: ${err instanceof Error ? err.message : 'Desconegut'}`);
+      }
+
       setLoading(false);
-      return;
     }
 
     fetchFluxos();
-
-    // Subscripció en temps real
-    const channel = supabase
-      .channel('fluxos-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'fluxos' },
-        () => {
-          fetchFluxos();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, []);
-
-  async function fetchFluxos() {
-    if (!isSupabaseConfigured) {
-      setLoading(false);
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from('fluxos')
-      .select('*')
-      .eq('actiu', true)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error carregant fluxos:', error);
-    } else {
-      setFluxos(data || []);
-    }
-    setLoading(false);
-  }
 
   const ofertes = fluxos.filter((f) => f.tipus === 'OFERTA');
   const demandes = fluxos.filter((f) => f.tipus === 'DEMANDA');
@@ -78,7 +73,7 @@ export default function Home() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Intro */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-light mb-3 text-slate-200">
             El Gresol Digital
           </h2>
@@ -86,6 +81,22 @@ export default function Home() {
             On el Do flueix lliurement entre ànimes
           </p>
         </div>
+
+        {/* Debug Panel */}
+        {error && (
+          <div className="mb-6 p-4 rounded-xl bg-red-900/30 border border-red-500/30">
+            <p className="text-red-400 font-medium">Error de connexió:</p>
+            <p className="text-red-300 text-sm mt-1">{error}</p>
+            {debug && <p className="text-red-400/60 text-xs mt-2">{debug}</p>}
+          </div>
+        )}
+
+        {/* Debug info (temporal) */}
+        {!error && debug && (
+          <div className="mb-6 p-3 rounded-xl bg-green-900/20 border border-green-500/20">
+            <p className="text-green-400 text-sm">{debug}</p>
+          </div>
+        )}
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
