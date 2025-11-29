@@ -48,11 +48,18 @@ export default function FluxCard({ flux }: FluxCardProps) {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ca-ES', {
-      day: 'numeric',
-      month: 'short',
-    });
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+      return date.toLocaleDateString('ca-ES', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+    } catch {
+      return '';
+    }
   };
 
   return (
