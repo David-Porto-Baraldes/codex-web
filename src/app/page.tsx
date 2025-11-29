@@ -2,24 +2,39 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import FluxCard, { Flux } from '@/components/FluxCard';
 
-// Client Supabase directe (sense cache)
+// Client Supabase
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
+interface Flux {
+  id: number;
+  tipus: 'OFERTA' | 'DEMANDA';
+  descripcio: string;
+  categoria?: string;
+  username?: string;
+  created_at: string;
+}
+
+interface Memory {
+  id: number;
+  user_id: number;
+  role: 'user' | 'assistant';
+  content: string;
+  created_at: string;
+  username?: string;
+}
+
 export default function Home() {
   const [fluxos, setFluxos] = useState<Flux[]>([]);
+  const [memories, setMemories] = useState<Memory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [debug, setDebug] = useState('');
 
   useEffect(() => {
-    async function fetchFluxos() {
-      // Debug: mostrar si tenim les claus
+    async function fetchData() {
       if (!supabaseUrl || !supabaseKey) {
-        setError('Falten les variables NEXT_PUBLIC_SUPABASE_URL o NEXT_PUBLIC_SUPABASE_ANON_KEY');
-        setDebug(`URL: ${supabaseUrl ? 'OK' : 'BUIDA'} | KEY: ${supabaseKey ? 'OK' : 'BUIDA'}`);
+        setError('Falten les variables de Supabase');
         setLoading(false);
         return;
       }
@@ -27,194 +42,221 @@ export default function Home() {
       try {
         const supabase = createClient(supabaseUrl, supabaseKey);
 
-        const { data, error: supabaseError } = await supabase
+        // Carrega fluxos
+        const { data: fluxosData, error: fluxosError } = await supabase
           .from('fluxos')
-          .select('*');
+          .select('*')
+          .order('created_at', { ascending: false });
 
-        if (supabaseError) {
-          setError(`Error Supabase: ${supabaseError.message}`);
-          setDebug(`Code: ${supabaseError.code} | Details: ${supabaseError.details || 'cap'}`);
+        if (fluxosError) {
+          setError(`Error fluxos: ${fluxosError.message}`);
         } else {
-          setFluxos(data || []);
-          setDebug(`Registres trobats: ${data?.length || 0}`);
+          setFluxos(fluxosData || []);
+        }
+
+        // Carrega memories
+        const { data: memoriesData, error: memoriesError } = await supabase
+          .from('memories')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(100);
+
+        if (memoriesError) {
+          console.log('Memories error:', memoriesError.message);
+        } else {
+          setMemories(memoriesData || []);
         }
       } catch (err) {
-        setError(`Error de connexió: ${err instanceof Error ? err.message : 'Desconegut'}`);
+        setError(`Error: ${err instanceof Error ? err.message : 'Desconegut'}`);
       }
 
       setLoading(false);
     }
 
-    fetchFluxos();
+    fetchData();
   }, []);
 
   const ofertes = fluxos.filter((f) => f.tipus === 'OFERTA');
   const demandes = fluxos.filter((f) => f.tipus === 'DEMANDA');
 
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+      return date.toLocaleDateString('ca-ES', {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return '';
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
+    <div className="min-h-screen bg-neutral-950 text-white font-sans">
       {/* Header */}
-      <header className="sticky top-0 z-50 glass border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">⚜️</span>
-              <h1 className="text-2xl font-bold tracking-tight text-gradient-gold">
-                CODEX VIVUS
-              </h1>
-            </div>
-            <p className="text-slate-400 text-sm italic">
-              "Ho tinc tot i no carrego res"
-            </p>
+      <header className="border-b border-neutral-800 bg-neutral-950/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-[1800px] mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">⚜️</span>
+            <h1 className="text-lg font-semibold text-amber-400">CODEX VIVUS</h1>
+            <span className="text-neutral-600 text-sm ml-2">Control Center</span>
+          </div>
+          <div className="flex items-center gap-4 text-xs text-neutral-500">
+            <span>{ofertes.length} ofertes</span>
+            <span>{memories.length} memories</span>
+            <span>{demandes.length} demandes</span>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        {/* Intro */}
-        <div className="text-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-light mb-3 text-slate-200">
-            El Gresol Digital
-          </h2>
-          <p className="text-slate-500 max-w-xl mx-auto">
-            On el Do flueix lliurement entre ànimes
-          </p>
+      {/* Error */}
+      {error && (
+        <div className="max-w-[1800px] mx-auto px-4 py-2">
+          <div className="bg-red-950/50 border border-red-900/50 rounded px-3 py-2 text-red-400 text-sm">
+            {error}
+          </div>
         </div>
+      )}
 
-        {/* Debug Panel */}
-        {error && (
-          <div className="mb-6 p-4 rounded-xl bg-red-900/30 border border-red-500/30">
-            <p className="text-red-400 font-medium">Error de connexió:</p>
-            <p className="text-red-300 text-sm mt-1">{error}</p>
-            {debug && <p className="text-red-400/60 text-xs mt-2">{debug}</p>}
-          </div>
-        )}
-
-        {/* Debug info (temporal) */}
-        {!error && debug && (
-          <div className="mb-6 p-3 rounded-xl bg-green-900/20 border border-green-500/20">
-            <p className="text-green-400 text-sm">{debug}</p>
-          </div>
-        )}
-
+      {/* Main Grid */}
+      <main className="max-w-[1800px] mx-auto px-4 py-4">
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="text-amber-400/60 animate-pulse-soft">
-              ⚜️ Carregant els Rius... ⚜️
-            </div>
+          <div className="flex items-center justify-center py-20 text-neutral-500">
+            Carregant...
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            {/* Columna Esquerra - El Riu del Donar (OFERTES) */}
-            <section>
-              <div className="flex items-center gap-3 mb-6 pb-3 border-b border-amber-500/20">
-                <span className="text-xl">🌊</span>
-                <div>
-                  <h3 className="text-xl font-semibold text-amber-400">
-                    El Riu del Donar
-                  </h3>
-                  <p className="text-xs text-slate-500">OFERTES</p>
-                </div>
-                <span className="ml-auto text-xs px-2 py-1 rounded-full bg-amber-500/10 text-amber-500">
-                  {ofertes.length}
-                </span>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Columna 1: OFERTES (Daurat) */}
+            <section className="space-y-3">
+              <div className="flex items-center gap-2 pb-2 border-b border-amber-900/30">
+                <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                <h2 className="text-sm font-medium text-amber-400 uppercase tracking-wide">
+                  Ofertes
+                </h2>
+                <span className="text-xs text-neutral-600 ml-auto">{ofertes.length}</span>
               </div>
-
-              {ofertes.length === 0 ? (
-                <div className="glass-gold rounded-2xl p-8 text-center">
-                  <span className="text-4xl mb-3 block">🌅</span>
-                  <p className="text-amber-200/60 text-sm">
-                    El riu espera les primeres ofrenes...
-                  </p>
-                  <a
-                    href="https://t.me/Codex_Suprem_bot"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block mt-4 text-xs text-amber-400 hover:text-amber-300 transition-colors"
-                  >
-                    Sigues el primer en oferir →
-                  </a>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {ofertes.map((flux) => (
-                    <FluxCard key={flux.id} flux={flux} />
-                  ))}
-                </div>
-              )}
+              <div className="space-y-2 max-h-[calc(100vh-160px)] overflow-y-auto pr-2">
+                {ofertes.length === 0 ? (
+                  <p className="text-neutral-600 text-sm py-4 text-center">Cap oferta</p>
+                ) : (
+                  ofertes.map((flux) => (
+                    <div
+                      key={flux.id}
+                      className="bg-neutral-900/50 border border-amber-900/20 rounded-lg p-3 hover:border-amber-800/40 transition-colors"
+                    >
+                      <p className="text-sm text-neutral-200 leading-relaxed">
+                        {flux.descripcio}
+                      </p>
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-neutral-800/50">
+                        {flux.categoria && (
+                          <span className="text-xs text-amber-600">{flux.categoria}</span>
+                        )}
+                        <span className="text-xs text-neutral-600">{formatDate(flux.created_at)}</span>
+                      </div>
+                      {flux.username && (
+                        <p className="text-xs text-neutral-700 mt-1">@{flux.username}</p>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
             </section>
 
-            {/* Columna Dreta - El Riu del Rebre (DEMANDES) */}
-            <section>
-              <div className="flex items-center gap-3 mb-6 pb-3 border-b border-slate-500/20">
-                <span className="text-xl">🌊</span>
-                <div>
-                  <h3 className="text-xl font-semibold text-slate-300">
-                    El Riu del Rebre
-                  </h3>
-                  <p className="text-xs text-slate-500">DEMANDES</p>
-                </div>
-                <span className="ml-auto text-xs px-2 py-1 rounded-full bg-slate-500/10 text-slate-400">
-                  {demandes.length}
-                </span>
+            {/* Columna 2: MEMÒRIA VIVA (Violeta) */}
+            <section className="space-y-3">
+              <div className="flex items-center gap-2 pb-2 border-b border-indigo-900/30">
+                <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
+                <h2 className="text-sm font-medium text-indigo-400 uppercase tracking-wide">
+                  Memòria Viva
+                </h2>
+                <span className="text-xs text-neutral-600 ml-auto">{memories.length}</span>
               </div>
+              <div className="space-y-2 max-h-[calc(100vh-160px)] overflow-y-auto pr-2">
+                {memories.length === 0 ? (
+                  <p className="text-neutral-600 text-sm py-4 text-center">Cap memòria</p>
+                ) : (
+                  memories.map((memory) => (
+                    <div
+                      key={memory.id}
+                      className={`rounded-lg p-3 ${
+                        memory.role === 'user'
+                          ? 'bg-neutral-900/30 border border-emerald-900/20 ml-4'
+                          : 'bg-indigo-950/30 border border-indigo-900/20 mr-4'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span
+                          className={`text-xs font-medium ${
+                            memory.role === 'user' ? 'text-emerald-500' : 'text-indigo-400'
+                          }`}
+                        >
+                          {memory.role === 'user' ? 'Usuari' : 'Bot'}
+                        </span>
+                        <span className="text-xs text-neutral-700">
+                          {formatDate(memory.created_at)}
+                        </span>
+                      </div>
+                      <p
+                        className={`text-sm leading-relaxed ${
+                          memory.role === 'user' ? 'text-neutral-300' : 'text-indigo-200'
+                        }`}
+                      >
+                        {memory.content}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </section>
 
-              {demandes.length === 0 ? (
-                <div className="glass-silver rounded-2xl p-8 text-center">
-                  <span className="text-4xl mb-3 block">🌙</span>
-                  <p className="text-slate-400/60 text-sm">
-                    El riu espera les primeres peticions...
-                  </p>
-                  <a
-                    href="https://t.me/Codex_Suprem_bot"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block mt-4 text-xs text-slate-400 hover:text-slate-300 transition-colors"
-                  >
-                    Expressa la teva necessitat →
-                  </a>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {demandes.map((flux) => (
-                    <FluxCard key={flux.id} flux={flux} />
-                  ))}
-                </div>
-              )}
+            {/* Columna 3: DEMANDES (Platejat) */}
+            <section className="space-y-3">
+              <div className="flex items-center gap-2 pb-2 border-b border-slate-700/30">
+                <div className="w-2 h-2 rounded-full bg-slate-400"></div>
+                <h2 className="text-sm font-medium text-slate-400 uppercase tracking-wide">
+                  Demandes
+                </h2>
+                <span className="text-xs text-neutral-600 ml-auto">{demandes.length}</span>
+              </div>
+              <div className="space-y-2 max-h-[calc(100vh-160px)] overflow-y-auto pr-2">
+                {demandes.length === 0 ? (
+                  <p className="text-neutral-600 text-sm py-4 text-center">Cap demanda</p>
+                ) : (
+                  demandes.map((flux) => (
+                    <div
+                      key={flux.id}
+                      className="bg-neutral-900/50 border border-slate-700/20 rounded-lg p-3 hover:border-slate-600/40 transition-colors"
+                    >
+                      <p className="text-sm text-neutral-200 leading-relaxed">
+                        {flux.descripcio}
+                      </p>
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-neutral-800/50">
+                        {flux.categoria && (
+                          <span className="text-xs text-slate-500">{flux.categoria}</span>
+                        )}
+                        <span className="text-xs text-neutral-600">{formatDate(flux.created_at)}</span>
+                      </div>
+                      {flux.username && (
+                        <p className="text-xs text-neutral-700 mt-1">@{flux.username}</p>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
             </section>
           </div>
         )}
-
-        {/* CTA Central */}
-        <div className="mt-16 text-center">
-          <div className="inline-flex flex-col items-center gap-4 glass rounded-2xl px-8 py-6">
-            <p className="text-slate-400 text-sm">
-              Vols participar en l'economia del Do?
-            </p>
-            <a
-              href="https://t.me/Codex_Suprem_bot"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-black font-semibold py-3 px-6 rounded-full transition-all transform hover:scale-105"
-            >
-              <span>Connecta amb el Bot</span>
-              <span>→</span>
-            </a>
-          </div>
-        </div>
       </main>
 
       {/* Footer */}
-      <footer className="mt-16 py-8 border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-slate-500 text-sm mb-2">
-            El Regne del Cor del U
-          </p>
-          <p className="text-slate-600 text-xs">
-            Arquitectura: David_Node_0 & Reina Viveka · Aho ⚜️
-          </p>
-        </div>
+      <footer className="border-t border-neutral-900 py-3 mt-4">
+        <p className="text-center text-xs text-neutral-700">
+          El Regne del Cor del U · Aho ⚜️
+        </p>
       </footer>
     </div>
   );
