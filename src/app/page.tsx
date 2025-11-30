@@ -28,6 +28,7 @@ interface Memory {
 type ViewType = 'ofertes' | 'demandes' | 'memories';
 
 export default function Home() {
+  const [showLanding, setShowLanding] = useState(true);
   const [fluxos, setFluxos] = useState<Flux[]>([]);
   const [memories, setMemories] = useState<Memory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -266,6 +267,67 @@ export default function Home() {
     }
   };
 
+  // Landing Page
+  if (showLanding) {
+    return (
+      <div 
+        className="h-screen w-screen bg-gradient-to-b from-stone-50 to-white flex items-center justify-center relative overflow-hidden"
+        style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}
+      >
+        {/* Animació de fons suau */}
+        <div className="absolute inset-0 opacity-[0.03]">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-400 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-400 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        </div>
+
+        {/* Contingut Principal */}
+        <div className="relative z-10 text-center px-6 max-w-3xl mx-auto animate-fade-in">
+          {/* Logo/Títol */}
+          <div className="mb-8">
+            <h1 className="text-7xl md:text-8xl font-serif text-slate-900 mb-4 tracking-tight" style={{ fontFamily: 'var(--font-playfair), serif' }}>
+              CODEX VIVUS
+            </h1>
+          </div>
+
+          {/* Subtítol */}
+          <p className="text-2xl md:text-3xl text-slate-700 font-light mb-8 italic">
+            Ho tinc tot i no carrego res.
+          </p>
+
+          {/* Descripció Poètica */}
+          <p className="text-lg md:text-xl text-slate-600 font-light leading-relaxed mb-12 max-w-2xl mx-auto">
+            Benvingut a l'Economia del Do. Un espai on la voluntat es troba amb el destí. Connecta, ofereix i rep.
+          </p>
+
+          {/* Botó Principal */}
+          <button
+            onClick={() => setShowLanding(false)}
+            className="group relative px-10 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-lg font-medium rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 mb-8 overflow-hidden"
+          >
+            <span className="relative z-10">ENTRAR AL GRESOL</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-600 to-amber-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </button>
+
+          {/* Enllaç Telegram (discret) */}
+          <div className="mt-12">
+            <a
+              href="https://t.me/Codex_Suprem_bot"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-slate-500 hover:text-slate-700 font-light transition-colors duration-200 inline-flex items-center gap-2"
+            >
+              <span>Parlar amb Viveka</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Aplicació Principal
   return (
     <div className="h-screen flex bg-white text-slate-800 overflow-hidden" style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
       {/* Barra Lateral Esquerra */}
