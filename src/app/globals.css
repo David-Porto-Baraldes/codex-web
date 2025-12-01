@@ -108,11 +108,15 @@ body {
   animation: pulse-soft 2s ease-in-out infinite;
 }
 
-/* Landing Page Animations */
+/* ═══════════════════════════════════════════════════════════
+   LANDING PAGE - Minimalisme Sagrat
+   ═══════════════════════════════════════════════════════════ */
+
+/* Fade in principal */
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -121,5 +125,152 @@ body {
 }
 
 .animate-fade-in {
-  animation: fade-in 1s ease-out forwards;
+  animation: fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Fade in amb delay escalonat */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-delay-1 {
+  opacity: 0;
+  animation: fade-in-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+}
+
+.animate-fade-in-delay-2 {
+  opacity: 0;
+  animation: fade-in-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
+}
+
+.animate-fade-in-delay-3 {
+  opacity: 0;
+  animation: fade-in-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.9s forwards;
+}
+
+.animate-fade-in-delay-4 {
+  opacity: 0;
+  animation: fade-in-up 1s cubic-bezier(0.22, 1, 0.36, 1) 1.2s forwards;
+}
+
+/* Respiració subtil per elements decoratius */
+@keyframes breathe {
+  0%, 100% {
+    opacity: 0.03;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.06;
+    transform: scale(1.05);
+  }
+}
+
+.animate-breathe {
+  animation: breathe 8s ease-in-out infinite;
+}
+
+.animate-breathe-slow {
+  animation: breathe 12s ease-in-out infinite;
+}
+
+/* Brillantor subtil del botó */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.btn-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+/* Línia decorativa animada */
+@keyframes line-grow {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 80px;
+    opacity: 1;
+  }
+}
+
+.animate-line-grow {
+  animation: line-grow 1.5s cubic-bezier(0.22, 1, 0.36, 1) 0.5s forwards;
+}
+
+/* Transició de sortida */
+@keyframes fade-out-scale {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+}
+
+.animate-fade-out {
+  animation: fade-out-scale 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Ornament flotant */
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-3px) rotate(0.5deg);
+  }
+  75% {
+    transform: translateY(3px) rotate(-0.5deg);
+  }
+}
+
+.animate-float-gentle {
+  animation: float-gentle 6s ease-in-out infinite;
+}
+
+/* Fons crema suau */
+.bg-sacred-cream {
+  background: linear-gradient(
+    180deg,
+    #fefdfb 0%,
+    #faf8f5 50%,
+    #f5f3f0 100%
+  );
+}
+
+/* Ombra elegant per botons */
+.shadow-sacred {
+  box-shadow:
+    0 4px 6px -1px rgba(180, 140, 80, 0.1),
+    0 10px 20px -5px rgba(180, 140, 80, 0.15),
+    0 25px 50px -12px rgba(180, 140, 80, 0.1);
+}
+
+.shadow-sacred-hover {
+  box-shadow:
+    0 8px 12px -2px rgba(180, 140, 80, 0.15),
+    0 20px 40px -8px rgba(180, 140, 80, 0.2),
+    0 40px 80px -16px rgba(180, 140, 80, 0.15);
 }

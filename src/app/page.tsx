@@ -29,6 +29,7 @@ type ViewType = 'ofertes' | 'demandes' | 'memories';
 
 export default function Home() {
   const [showLanding, setShowLanding] = useState(true);
+  const [isExiting, setIsExiting] = useState(false);
   const [fluxos, setFluxos] = useState<Flux[]>([]);
   const [memories, setMemories] = useState<Memory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -267,61 +268,163 @@ export default function Home() {
     }
   };
 
-  // Landing Page
+  // Gestió de la transició de sortida
+  const handleEnter = () => {
+    setIsExiting(true);
+    setTimeout(() => {
+      setShowLanding(false);
+    }, 600);
+  };
+
+  // Landing Page - La Porta Sagrada
   if (showLanding) {
     return (
-      <div 
-        className="h-screen w-screen bg-gradient-to-b from-stone-50 to-white flex items-center justify-center relative overflow-hidden"
-        style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}
+      <div
+        className={`h-screen w-screen bg-sacred-cream flex items-center justify-center relative overflow-hidden ${isExiting ? 'animate-fade-out' : ''}`}
       >
-        {/* Animació de fons suau */}
-        <div className="absolute inset-0 opacity-[0.03]">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-400 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-400 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        {/* Cercles decoratius que respiren */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Cercle daurat superior esquerra */}
+          <div
+            className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full animate-breathe"
+            style={{
+              background: 'radial-gradient(circle, rgba(217, 175, 98, 0.08) 0%, transparent 70%)'
+            }}
+          />
+          {/* Cercle violeta inferior dreta */}
+          <div
+            className="absolute -bottom-48 -right-48 w-[600px] h-[600px] rounded-full animate-breathe-slow"
+            style={{
+              background: 'radial-gradient(circle, rgba(168, 139, 183, 0.06) 0%, transparent 70%)',
+              animationDelay: '4s'
+            }}
+          />
+          {/* Cercle central subtil */}
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full animate-breathe"
+            style={{
+              background: 'radial-gradient(circle, rgba(180, 140, 80, 0.03) 0%, transparent 60%)',
+              animationDelay: '2s'
+            }}
+          />
         </div>
 
         {/* Contingut Principal */}
-        <div className="relative z-10 text-center px-6 max-w-3xl mx-auto animate-fade-in">
-          {/* Logo/Títol */}
-          <div className="mb-8">
-            <h1 className="text-7xl md:text-8xl font-serif text-slate-900 mb-4 tracking-tight" style={{ fontFamily: 'var(--font-playfair), serif' }}>
-              CODEX VIVUS
-            </h1>
+        <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
+
+          {/* Ornament superior */}
+          <div className="animate-fade-in mb-6">
+            <div className="flex items-center justify-center gap-4">
+              <div className="h-[1px] w-0 bg-gradient-to-r from-transparent to-amber-400/40 animate-line-grow" />
+              <span className="text-amber-600/60 text-2xl animate-float-gentle">◆</span>
+              <div className="h-[1px] w-0 bg-gradient-to-l from-transparent to-amber-400/40 animate-line-grow" />
+            </div>
           </div>
 
-          {/* Subtítol */}
-          <p className="text-2xl md:text-3xl text-slate-700 font-light mb-8 italic">
+          {/* Títol Principal */}
+          <h1
+            className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl text-stone-800 mb-6 tracking-[0.15em] animate-fade-in-delay-1"
+            style={{ fontFamily: 'var(--font-playfair), Georgia, serif', fontWeight: 400 }}
+          >
+            CODEX VIVUS
+          </h1>
+
+          {/* Línia decorativa sota el títol */}
+          <div className="flex justify-center mb-8 animate-fade-in-delay-1">
+            <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
+          </div>
+
+          {/* Subtítol - La Frase Sagrada */}
+          <p
+            className="text-xl sm:text-2xl md:text-3xl text-stone-600 mb-10 tracking-wide animate-fade-in-delay-2"
+            style={{ fontFamily: 'var(--font-playfair), Georgia, serif', fontStyle: 'italic', fontWeight: 400 }}
+          >
             Ho tinc tot i no carrego res.
           </p>
 
           {/* Descripció Poètica */}
-          <p className="text-lg md:text-xl text-slate-600 font-light leading-relaxed mb-12 max-w-2xl mx-auto">
-            Benvingut a l'Economia del Do. Un espai on la voluntat es troba amb el destí. Connecta, ofereix i rep.
+          <p
+            className="text-base sm:text-lg md:text-xl text-stone-500 font-light leading-relaxed mb-14 max-w-xl mx-auto animate-fade-in-delay-2"
+            style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}
+          >
+            Benvingut a l&apos;Economia del Do.<br className="hidden sm:block" />
+            Un espai on la voluntat es troba amb el destí.<br className="hidden sm:block" />
+            <span className="text-stone-600">Connecta, ofereix i rep.</span>
           </p>
 
-          {/* Botó Principal */}
-          <button
-            onClick={() => setShowLanding(false)}
-            className="group relative px-10 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-lg font-medium rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 mb-8 overflow-hidden"
-          >
-            <span className="relative z-10">ENTRAR AL GRESOL</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-600 to-amber-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          </button>
+          {/* Botó Principal - ENTRAR AL GRESOL */}
+          <div className="animate-fade-in-delay-3 mb-16">
+            <button
+              onClick={handleEnter}
+              className="group relative px-12 py-5 rounded-full shadow-sacred hover:shadow-sacred-hover transition-all duration-500 ease-out hover:scale-[1.02] overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, #c9a55c 0%, #b8934f 50%, #a67c3d 100%)',
+              }}
+            >
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 btn-shimmer opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-          {/* Enllaç Telegram (discret) */}
-          <div className="mt-12">
+              {/* Text del botó */}
+              <span
+                className="relative z-10 text-white text-sm sm:text-base tracking-[0.25em] font-medium"
+                style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}
+              >
+                ENTRAR AL GRESOL
+              </span>
+            </button>
+          </div>
+
+          {/* Ornament inferior */}
+          <div className="animate-fade-in-delay-3 mb-8">
+            <div className="flex items-center justify-center gap-3 text-stone-400/50 text-xs tracking-[0.3em]">
+              <span>✦</span>
+              <span>✦</span>
+              <span>✦</span>
+            </div>
+          </div>
+
+          {/* Enllaç Telegram - Parlar amb Viveka */}
+          <div className="animate-fade-in-delay-4">
             <a
               href="https://t.me/Codex_Suprem_bot"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-slate-500 hover:text-slate-700 font-light transition-colors duration-200 inline-flex items-center gap-2"
+              className="inline-flex items-center gap-3 text-stone-400 hover:text-amber-600 transition-colors duration-300 group"
             >
-              <span>Parlar amb Viveka</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {/* Icona Telegram */}
+              <svg
+                className="w-4 h-4 opacity-60 group-hover:opacity-100 transition-opacity"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.74 3.99-1.74 6.65-2.89 7.99-3.44 3.8-1.58 4.59-1.86 5.1-1.87.11 0 .37.03.54.17.14.12.18.28.2.45-.01.06.01.24 0 .38z"/>
+              </svg>
+              <span
+                className="text-sm tracking-wide"
+                style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}
+              >
+                Parlar amb Viveka
+              </span>
+              <svg
+                className="w-3 h-3 opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </a>
           </div>
+        </div>
+
+        {/* Peu discret */}
+        <div className="absolute bottom-6 left-0 right-0 text-center animate-fade-in-delay-4">
+          <p
+            className="text-xs text-stone-400/60 tracking-widest"
+            style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}
+          >
+            EL REGNE DEL COR DEL U
+          </p>
         </div>
       </div>
     );
