@@ -21,7 +21,7 @@ interface Memory {
   user_id: number;
   role: 'user' | 'assistant';
   content: string;
-  created_at: string;
+  created_at?: string;
   username?: string;
 }
 
@@ -59,11 +59,11 @@ export default function Home() {
           setFluxos(fluxosData || []);
         }
 
-        // Carrega memories (ordenades per created_at descendent)
+        // Carrega memories (ordenades per id descendent)
         const { data: memoriesData, error: memoriesError } = await supabase
           .from('memories')
           .select('*')
-          .order('created_at', { ascending: false });
+          .order('id', { ascending: false });
 
         if (memoriesError) {
           console.error('Error carregant memories:', memoriesError);
@@ -247,9 +247,11 @@ export default function Home() {
                           >
                             {memory.role === 'user' ? 'Usuari' : 'Nexia'}
                           </span>
-                          <span className="text-xs text-slate-400 font-light">
-                            {formatDate(memory.created_at)}
-                          </span>
+                          {memory.created_at && (
+                            <span className="text-xs text-slate-400 font-light">
+                              {formatDate(memory.created_at)}
+                            </span>
+                          )}
                         </div>
                         <p className="text-sm leading-relaxed whitespace-pre-wrap break-words font-light">
                           {memory.content}
