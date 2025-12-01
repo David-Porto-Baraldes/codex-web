@@ -61,7 +61,7 @@ export default function Home() {
 
         // Carrega memories (ordenades per id descendent)
         const { data: memoriesData, error: memoriesError } = await supabase
-          .from('memories_viveka')
+          .from('memories')
           .select('*')
           .order('id', { ascending: false });
 
