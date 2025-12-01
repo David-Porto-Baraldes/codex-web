@@ -65,10 +65,13 @@ export default function Home() {
           .select('*')
           .order('id', { ascending: false });
 
+        console.log('Memories response:', { data: memoriesData, error: memoriesError });
+
         if (memoriesError) {
           console.error('Error carregant memories:', memoriesError);
           setError(prev => prev ? `${prev} | Error memories: ${memoriesError.message}` : `Error memories: ${memoriesError.message}`);
         } else {
+          console.log('Memories carregades:', memoriesData?.length || 0);
           setMemories(memoriesData || []);
         }
       } catch (err) {
