@@ -67,6 +67,7 @@ export default function Home() {
 
         if (memoriesError) {
           console.error('Error carregant memories:', memoriesError);
+          setError(prev => prev ? `${prev} | Error memories: ${memoriesError.message}` : `Error memories: ${memoriesError.message}`);
         } else {
           setMemories(memoriesData || []);
         }
