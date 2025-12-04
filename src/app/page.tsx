@@ -7,11 +7,14 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-interface Flux {
+interface ChatMessage {
   id: number;
-  tipus: 'OFERTA' | 'DEMANDA';
-  descripcio: string;
-  categoria?: string;
+  user_id: number;
+  role: 'user' | 'assistant';
+  content: string;
+  intent_type?: 'GIFT' | 'NEED' | 'KNOWLEDGE' | 'PRESENCE';
+  tags?: string[];
+  created_at?: string;
   username?: string;
 }
 
@@ -29,7 +32,7 @@ const TELEGRAM_BOT_URL = "https://t.me/Codex_Suprem_bot";
 
 export default function Home() {
   const [showLanding, setShowLanding] = useState(true);
-  const [fluxos, setFluxos] = useState<Flux[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [teixitStats, setTeixitStats] = useState<TeixitStats>({
     dons24h: 0,
     necessitats24h: 0,
@@ -52,36 +55,30 @@ export default function Home() {
     try {
       const supabase = createClient(supabaseUrl, supabaseKey);
 
-      // Carrega tots els fluxos (només columnes que existeixen)
-      const { data: fluxosData, error: fluxosError } = await supabase
-        .from('fluxos')
-        .select('id, tipus, descripcio, categoria, username')
-        .order('id', { ascending: false });
+      // Carrega missatges de chat_history amb intent_type (taula del bot)
+      const { data: chatData, error: chatError } = await supabase
+        .from('chat_history')
+        .select('id, user_id, role, content, intent_type, tags, created_at')
+        .eq('role', 'user') // Només missatges d'usuaris
+        .order('created_at', { ascending: false });
 
-      if (fluxosError) {
-        console.error('Error carregant fluxos:', fluxosError);
-        setError(`Error al teixit: ${fluxosError.message}`);
+      if (chatError) {
+        console.error('Error carregant chat_history:', chatError);
+        setError(`Error al teixit: ${chatError.message}`);
       } else {
-        const fluxosList = fluxosData || [];
-        setFluxos(fluxosList);
+        const messagesList = chatData || [];
+        setMessages(messagesList);
 
-        // Calcular estadístiques del teixit
-        const dons = fluxosList.filter((f) => {
-          const tipus = String(f.tipus || '').trim().toUpperCase();
-          return tipus === 'OFERTA';
-        });
+        // Filtrar per intent_type (GIFT = Dons, NEED = Necessitats)
+        const dons = messagesList.filter((m) => m.intent_type === 'GIFT');
+        const necessitats = messagesList.filter((m) => m.intent_type === 'NEED');
 
-        const necessitats = fluxosList.filter((f) => {
-          const tipus = String(f.tipus || '').trim().toUpperCase();
-          return tipus === 'DEMANDA';
-        });
-
-        // Últims conceptes (anonimitzats)
-        const ultimsDons = dons.slice(0, 5).map((f) => f.categoria || f.descripcio?.slice(0, 30) || 'Do anònim');
-        const ultimesNecessitats = necessitats.slice(0, 5).map((f) => f.categoria || f.descripcio?.slice(0, 30) || 'Necessitat anònima');
+        // Últims conceptes (anonimitzats - mostrem només els primers 30 chars del content)
+        const ultimsDons = dons.slice(0, 5).map((m) => m.content?.slice(0, 40) || 'Do anònim');
+        const ultimesNecessitats = necessitats.slice(0, 5).map((m) => m.content?.slice(0, 40) || 'Necessitat anònima');
 
         setTeixitStats({
-          dons24h: dons.length, // Sense created_at, mostrem el total
+          dons24h: dons.length,
           necessitats24h: necessitats.length,
           totalDons: dons.length,
           totalNecessitats: necessitats.length,
@@ -104,9 +101,9 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  // Filtrar fluxos
-  const dons = fluxos.filter((f) => String(f.tipus || '').trim().toUpperCase() === 'OFERTA');
-  const necessitats = fluxos.filter((f) => String(f.tipus || '').trim().toUpperCase() === 'DEMANDA');
+  // Filtrar per intent_type
+  const dons = messages.filter((m) => m.intent_type === 'GIFT');
+  const necessitats = messages.filter((m) => m.intent_type === 'NEED');
 
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
@@ -482,17 +479,21 @@ export default function Home() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {dons.map((flux) => (
-                  <div key={flux.id} className="card-teler p-5">
-                    {flux.categoria && (
-                      <span className="inline-block text-xs px-2 py-1 rounded bg-amber-500/20 text-amber-400 mb-3">
-                        {flux.categoria}
-                      </span>
+                {dons.map((msg) => (
+                  <div key={msg.id} className="card-teler p-5">
+                    {msg.tags && msg.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {msg.tags.map((tag, i) => (
+                          <span key={i} className="inline-block text-xs px-2 py-1 rounded bg-amber-500/20 text-amber-400">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     )}
-                    <p className="text-slate-200 text-sm leading-relaxed mb-4">{flux.descripcio}</p>
+                    <p className="text-slate-200 text-sm leading-relaxed mb-4">{msg.content}</p>
                     <div className="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-white/5">
-                      {flux.username && <span>@{flux.username}</span>}
-                      {flux.created_at && <span>{formatDate(flux.created_at)}</span>}
+                      <span className="text-amber-400/60">Do</span>
+                      {msg.created_at && <span>{formatDate(msg.created_at)}</span>}
                     </div>
                   </div>
                 ))}
@@ -526,17 +527,21 @@ export default function Home() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {necessitats.map((flux) => (
-                  <div key={flux.id} className="card-teler-blue p-5">
-                    {flux.categoria && (
-                      <span className="inline-block text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-400 mb-3">
-                        {flux.categoria}
-                      </span>
+                {necessitats.map((msg) => (
+                  <div key={msg.id} className="card-teler-blue p-5">
+                    {msg.tags && msg.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {msg.tags.map((tag, i) => (
+                          <span key={i} className="inline-block text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-400">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     )}
-                    <p className="text-slate-200 text-sm leading-relaxed mb-4">{flux.descripcio}</p>
+                    <p className="text-slate-200 text-sm leading-relaxed mb-4">{msg.content}</p>
                     <div className="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-white/5">
-                      {flux.username && <span>@{flux.username}</span>}
-                      {flux.created_at && <span>{formatDate(flux.created_at)}</span>}
+                      <span className="text-blue-400/60">Necessitat</span>
+                      {msg.created_at && <span>{formatDate(msg.created_at)}</span>}
                     </div>
                   </div>
                 ))}
