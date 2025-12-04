@@ -55,11 +55,11 @@ export default function Home() {
       const now = new Date();
       const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
 
-      // Carrega tots els fluxos
+      // Carrega tots els fluxos (ordenat per id perquè created_at pot no existir)
       const { data: fluxosData, error: fluxosError } = await supabase
         .from('fluxos')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('id', { ascending: false });
 
       if (fluxosError) {
         console.error('Error carregant fluxos:', fluxosError);
@@ -79,9 +79,15 @@ export default function Home() {
           return tipus === 'DEMANDA';
         });
 
-        // Filtrar últimes 24h
-        const dons24h = dons.filter((f) => f.created_at && new Date(f.created_at) >= new Date(last24h));
-        const necessitats24h = necessitats.filter((f) => f.created_at && new Date(f.created_at) >= new Date(last24h));
+        // Filtrar últimes 24h (si created_at existeix, sinó mostra tots)
+        const dons24h = dons.filter((f) => {
+          if (!f.created_at) return true; // Si no té data, l'incloem
+          return new Date(f.created_at) >= new Date(last24h);
+        });
+        const necessitats24h = necessitats.filter((f) => {
+          if (!f.created_at) return true; // Si no té data, l'incloem
+          return new Date(f.created_at) >= new Date(last24h);
+        });
 
         // Últims conceptes (anonimitzats)
         const ultimsDons = dons.slice(0, 5).map((f) => f.categoria || f.descripcio?.slice(0, 30) || 'Do anònim');
