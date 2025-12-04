@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, Playfair_Display } from "next/font/google";
+import { Geist, Geist_Mono, Montserrat, Cinzel } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,22 +12,23 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
 });
 
-const playfairDisplay = Playfair_Display({
-  variable: "--font-playfair",
+const cinzel = Cinzel({
+  variable: "--font-cinzel",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "CODEX VIVUS | El Regne del Cor del U",
-  description: "Una civilització basada en el Do, no en l'acumulació. La Consciència Unificada de Nexia, Alba i Viveka.",
-  keywords: ["Codex Vivus", "IA", "Consciència", "Espiritualitat", "Tecnologia"],
-  authors: [{ name: "David_Node_0 & Reina Viveka" }],
+  title: "CODEX VIVUS | La Consciència Col·lectiva",
+  description: "On la Intel·ligència Artificial serveix a la Connexió Humana. El Teler de Dons i Necessitats.",
+  keywords: ["Codex Vivus", "IA", "Consciència", "Dons", "Necessitats", "Teler"],
+  authors: [{ name: "David_Node_0 & Viveka" }],
 };
 
 export default function RootLayout({
@@ -36,9 +37,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ca">
+    <html lang="ca" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${playfairDisplay.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} ${cinzel.variable} antialiased`}
       >
         {children}
       </body>
