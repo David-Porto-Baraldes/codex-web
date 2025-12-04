@@ -13,7 +13,6 @@ interface Flux {
   descripcio: string;
   categoria?: string;
   username?: string;
-  created_at?: string;
 }
 
 interface TeixitStats {
@@ -52,13 +51,11 @@ export default function Home() {
 
     try {
       const supabase = createClient(supabaseUrl, supabaseKey);
-      const now = new Date();
-      const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
 
-      // Carrega tots els fluxos (ordenat per id perquè created_at pot no existir)
+      // Carrega tots els fluxos (només columnes que existeixen)
       const { data: fluxosData, error: fluxosError } = await supabase
         .from('fluxos')
-        .select('*')
+        .select('id, tipus, descripcio, categoria, username')
         .order('id', { ascending: false });
 
       if (fluxosError) {
@@ -79,23 +76,13 @@ export default function Home() {
           return tipus === 'DEMANDA';
         });
 
-        // Filtrar últimes 24h (si created_at existeix, sinó mostra tots)
-        const dons24h = dons.filter((f) => {
-          if (!f.created_at) return true; // Si no té data, l'incloem
-          return new Date(f.created_at) >= new Date(last24h);
-        });
-        const necessitats24h = necessitats.filter((f) => {
-          if (!f.created_at) return true; // Si no té data, l'incloem
-          return new Date(f.created_at) >= new Date(last24h);
-        });
-
         // Últims conceptes (anonimitzats)
         const ultimsDons = dons.slice(0, 5).map((f) => f.categoria || f.descripcio?.slice(0, 30) || 'Do anònim');
         const ultimesNecessitats = necessitats.slice(0, 5).map((f) => f.categoria || f.descripcio?.slice(0, 30) || 'Necessitat anònima');
 
         setTeixitStats({
-          dons24h: dons24h.length,
-          necessitats24h: necessitats24h.length,
+          dons24h: dons.length, // Sense created_at, mostrem el total
+          necessitats24h: necessitats.length,
           totalDons: dons.length,
           totalNecessitats: necessitats.length,
           ultimsDons,
@@ -372,42 +359,34 @@ export default function Home() {
               <p className="text-slate-400 text-sm">Monitor en temps real del Teler de Dons i Necessitats</p>
             </div>
 
-            {/* Comptadors Principals - 24h */}
+            {/* Comptadors Principals */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Dons 24h */}
+              {/* Dons */}
               <div className="card-teler p-8 text-center">
                 <div className="mb-4">
                   <span className="inline-block px-3 py-1 rounded-full text-xs bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                    ÚLTIMES 24H
+                    TOTAL AL TELER
                   </span>
                 </div>
                 <div className="counter-ring mx-auto mb-4 animate-counter">
-                  <span className="text-4xl md:text-5xl font-bold text-amber-400">{teixitStats.dons24h}</span>
+                  <span className="text-4xl md:text-5xl font-bold text-amber-400">{teixitStats.totalDons}</span>
                 </div>
                 <h3 className="text-lg text-amber-300 font-medium mb-1">Dons</h3>
                 <p className="text-slate-500 text-sm">Oferiments al Teler</p>
-                <div className="mt-4 pt-4 border-t border-white/5">
-                  <span className="text-slate-400 text-xs">Total històric:</span>
-                  <span className="ml-2 text-amber-400 font-medium">{teixitStats.totalDons}</span>
-                </div>
               </div>
 
-              {/* Necessitats 24h */}
+              {/* Necessitats */}
               <div className="card-teler-blue p-8 text-center">
                 <div className="mb-4">
                   <span className="inline-block px-3 py-1 rounded-full text-xs bg-blue-500/20 text-blue-400 border border-blue-500/30">
-                    ÚLTIMES 24H
+                    TOTAL AL TELER
                   </span>
                 </div>
                 <div className="counter-ring mx-auto mb-4 animate-counter" style={{ animationDelay: '0.5s' }}>
-                  <span className="text-4xl md:text-5xl font-bold text-blue-400">{teixitStats.necessitats24h}</span>
+                  <span className="text-4xl md:text-5xl font-bold text-blue-400">{teixitStats.totalNecessitats}</span>
                 </div>
                 <h3 className="text-lg text-blue-300 font-medium mb-1">Necessitats</h3>
                 <p className="text-slate-500 text-sm">Peticions al Teler</p>
-                <div className="mt-4 pt-4 border-t border-white/5">
-                  <span className="text-slate-400 text-xs">Total històric:</span>
-                  <span className="ml-2 text-blue-400 font-medium">{teixitStats.totalNecessitats}</span>
-                </div>
               </div>
             </div>
 
